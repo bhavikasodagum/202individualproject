@@ -1,0 +1,170 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>RequestLogAggregator.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">log-parser</a> &gt; <a href="index.source.html" class="el_package">com.logparser.aggregators</a> &gt; <span class="el_source">RequestLogAggregator.java</span></div><h1>RequestLogAggregator.java</h1><pre class="source lang-java linenums">package com.logparser.aggregators;
+
+import com.logparser.logs.RequestLogEntry;
+import com.logparser.logs.LogEntry;
+
+import java.util.*;
+
+/**
+ * Aggregator for Request logs.
+ * Implements the LogAggregator strategy for request log entries.
+ */
+<span class="nc" id="L12">public class RequestLogAggregator implements LogAggregator {</span>
+
+<span class="nc" id="L14">    private static final List&lt;Integer&gt; PERCENTILES = Arrays.asList(50, 90, 95, 99);</span>
+
+    // Map to store response times grouped by API route
+<span class="nc" id="L17">    private final Map&lt;String, List&lt;Double&gt;&gt; responseTimesMap = new HashMap&lt;&gt;();</span>
+
+    // Map to store status code counts grouped by API route
+<span class="nc" id="L20">    private final Map&lt;String, Map&lt;String, Integer&gt;&gt; statusCodesMap = new HashMap&lt;&gt;();</span>
+
+    /**
+     * Adds a log entry for aggregation.
+     * Only processes RequestLogEntry instances.
+     *
+     * @param entry The LogEntry to aggregate.
+     */
+    @Override
+    public void addLog(LogEntry entry) {
+<span class="nc bnc" id="L30" title="All 2 branches missed.">        if (entry instanceof RequestLogEntry) {</span>
+<span class="nc" id="L31">            RequestLogEntry requestLog = (RequestLogEntry) entry;</span>
+<span class="nc" id="L32">            String url = requestLog.getRequestUrl();</span>
+<span class="nc" id="L33">            double responseTime = requestLog.getResponseTimeMs();</span>
+<span class="nc" id="L34">            String statusCodeCategory = getStatusCategory(requestLog.getResponseStatus());</span>
+
+            // Add response time to the map
+<span class="nc" id="L37">            responseTimesMap.computeIfAbsent(url, k -&gt; new ArrayList&lt;&gt;()).add(responseTime);</span>
+
+            // Update status code counts
+<span class="nc" id="L40">            statusCodesMap.computeIfAbsent(url, k -&gt; initializeStatusCounts())</span>
+<span class="nc" id="L41">                    .merge(statusCodeCategory, 1, Integer::sum);</span>
+        }
+<span class="nc" id="L43">    }</span>
+
+    /**
+     * Aggregates the logs and returns the results as a Map.
+     *
+     * @return A Map of aggregated statistics for each API route.
+     */
+    @Override
+    public Map&lt;String, Map&lt;String, Object&gt;&gt; aggregate() {
+<span class="nc" id="L52">        Map&lt;String, Map&lt;String, Object&gt;&gt; result = new HashMap&lt;&gt;();</span>
+
+<span class="nc bnc" id="L54" title="All 2 branches missed.">        for (String url : responseTimesMap.keySet()) {</span>
+<span class="nc" id="L55">            List&lt;Double&gt; responseTimes = responseTimesMap.get(url);</span>
+<span class="nc" id="L56">            Collections.sort(responseTimes);  // Sort response times for percentile calculations</span>
+
+            // Calculate statistics
+<span class="nc" id="L59">            int min = (int) responseTimes.get(0).doubleValue();</span>
+<span class="nc" id="L60">            int max = (int) responseTimes.get(responseTimes.size() - 1).doubleValue();</span>
+
+<span class="nc" id="L62">            Map&lt;String, Object&gt; routeStats = new LinkedHashMap&lt;&gt;();</span>
+<span class="nc" id="L63">            routeStats.put(&quot;response_times&quot;, calculateResponseTimeStats(responseTimes, min, max));</span>
+<span class="nc" id="L64">            routeStats.put(&quot;status_codes&quot;, statusCodesMap.get(url));</span>
+
+<span class="nc" id="L66">            result.put(url, routeStats);</span>
+<span class="nc" id="L67">        }</span>
+
+<span class="nc" id="L69">        return result;</span>
+    }
+
+    /**
+     * Calculates response time statistics, including percentiles.
+     *
+     * @param values The sorted list of response times.
+     * @param min    The minimum response time.
+     * @param max    The maximum response time.
+     * @return A map of response time statistics.
+     */
+    private Map&lt;String, Object&gt; calculateResponseTimeStats(List&lt;Double&gt; values, int min, int max) {
+<span class="nc" id="L81">        Map&lt;String, Object&gt; stats = new LinkedHashMap&lt;&gt;();</span>
+<span class="nc" id="L82">        stats.put(&quot;min&quot;, min);</span>
+
+<span class="nc bnc" id="L84" title="All 2 branches missed.">        for (int percentile : PERCENTILES) {</span>
+<span class="nc" id="L85">            double percentileValue = calculatePercentile(values, percentile);</span>
+<span class="nc bnc" id="L86" title="All 2 branches missed.">            if (percentile == 99) {</span>
+<span class="nc" id="L87">                stats.put(percentile + &quot;_percentile&quot;, roundToTwoDecimalPlaces(percentileValue));</span>
+            } else {
+<span class="nc" id="L89">                stats.put(percentile + &quot;_percentile&quot;, roundToOneDecimalPlace(percentileValue));</span>
+            }
+<span class="nc" id="L91">        }</span>
+
+<span class="nc" id="L93">        stats.put(&quot;max&quot;, max);</span>
+<span class="nc" id="L94">        return stats;</span>
+    }
+
+    /**
+     * Calculates the percentile value from a sorted list of doubles.
+     *
+     * @param values     The sorted list of response times.
+     * @param percentile The desired percentile (e.g., 50, 90).
+     * @return The percentile value.
+     */
+    private double calculatePercentile(List&lt;Double&gt; values, int percentile) {
+<span class="nc" id="L105">        int n = values.size();</span>
+<span class="nc" id="L106">        double rank = (percentile / 100.0) * (n - 1); // Rank index</span>
+<span class="nc" id="L107">        int lowerIndex = (int) Math.floor(rank);</span>
+<span class="nc" id="L108">        int upperIndex = (int) Math.ceil(rank);</span>
+
+<span class="nc bnc" id="L110" title="All 2 branches missed.">        if (lowerIndex == upperIndex) {</span>
+<span class="nc" id="L111">            return values.get(lowerIndex);</span>
+        } else {
+            // Linear interpolation
+<span class="nc" id="L114">            double lowerValue = values.get(lowerIndex);</span>
+<span class="nc" id="L115">            double upperValue = values.get(upperIndex);</span>
+<span class="nc" id="L116">            return lowerValue + (rank - lowerIndex) * (upperValue - lowerValue);</span>
+        }
+    }
+
+    /**
+     * Converts an HTTP status code into its category (e.g., &quot;2XX&quot;, &quot;4XX&quot;).
+     *
+     * @param statusCode The HTTP status code as a String.
+     * @return The status code category (e.g., &quot;2XX&quot;).
+     */
+    private String getStatusCategory(String statusCode) {
+<span class="nc bnc" id="L127" title="All 2 branches missed.">        if (statusCode.startsWith(&quot;2&quot;)) {</span>
+<span class="nc" id="L128">            return &quot;2XX&quot;;</span>
+<span class="nc bnc" id="L129" title="All 2 branches missed.">        } else if (statusCode.startsWith(&quot;4&quot;)) {</span>
+<span class="nc" id="L130">            return &quot;4XX&quot;;</span>
+<span class="nc bnc" id="L131" title="All 2 branches missed.">        } else if (statusCode.startsWith(&quot;5&quot;)) {</span>
+<span class="nc" id="L132">            return &quot;5XX&quot;;</span>
+        }
+<span class="nc" id="L134">        return &quot;Other&quot;;</span>
+    }
+
+    /**
+     * Initializes status code counts with zero values for &quot;2XX&quot;, &quot;4XX&quot;, and &quot;5XX&quot;.
+     *
+     * @return A map with initialized status code categories.
+     */
+    private Map&lt;String, Integer&gt; initializeStatusCounts() {
+<span class="nc" id="L143">        Map&lt;String, Integer&gt; counts = new HashMap&lt;&gt;();</span>
+<span class="nc" id="L144">        counts.put(&quot;2XX&quot;, 0);</span>
+<span class="nc" id="L145">        counts.put(&quot;4XX&quot;, 0);</span>
+<span class="nc" id="L146">        counts.put(&quot;5XX&quot;, 0);</span>
+<span class="nc" id="L147">        return counts;</span>
+    }
+
+    /**
+     * Rounds a value to one decimal place.
+     *
+     * @param value The value to round.
+     * @return The rounded value.
+     */
+    private double roundToOneDecimalPlace(double value) {
+<span class="nc" id="L157">        return Math.round(value * 10.0) / 10.0;</span>
+    }
+
+    /**
+     * Rounds a value to two decimal places.
+     *
+     * @param value The value to round.
+     * @return The rounded value.
+     */
+    private double roundToTwoDecimalPlaces(double value) {
+<span class="nc" id="L167">        return Math.round(value * 100.0) / 100.0;</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.8.202204050719</span></div></body></html>

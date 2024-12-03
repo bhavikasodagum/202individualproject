@@ -41,6 +41,31 @@
             <artifactId>commons-lang3</artifactId>
             <version>3.12.0</version>
         </dependency>
+         <!-- AssertJ for assertions -->
+    <dependency>
+        <groupId>org.assertj</groupId>
+        <artifactId>assertj-core</artifactId>
+        <version>3.21.0</version>
+        <scope>test</scope>
+    </dependency>
+
+     <!-- Mockito for mocking -->
+    <dependency>
+        <groupId>org.mockito</groupId>
+        <artifactId>mockito-junit-jupiter</artifactId>
+        <version>3.12.4</version>
+        <scope>test</scope>
+    </dependency>
+
+    <!-- Add this for mocking static methods -->
+<dependency>
+    <groupId>org.mockito</groupId>
+    <artifactId>mockito-inline</artifactId>
+    <version>3.12.4</version>
+    <scope>test</scope>
+</dependency>
+
+
     </dependencies>
 
     <build>
@@ -76,20 +101,46 @@
                     </archive>
                 </configuration>
             </plugin>
+
+            <!-- Maven Shade Plugin to create an executable JAR -->
             <plugin>
-              <groupId>org.apache.maven.plugins</groupId>
-               <artifactId>maven-shade-plugin</artifactId>
-                 <version>3.2.4</version>
-                  <executions>
-                  <execution>
-                  <phase>package</phase>
-                   <goals>
-                   <goal>shade</goal>
-                   </goals>
-                  </execution>
-                  </executions>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-shade-plugin</artifactId>
+                <version>3.2.4</version>
+                <executions>
+                    <execution>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>shade</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+
+            <!-- JaCoCo Plugin for code coverage -->
+            <plugin>
+                <groupId>org.jacoco</groupId>
+                <artifactId>jacoco-maven-plugin</artifactId>
+                <version>0.8.8</version>
+                <executions>
+                    <!-- Prepare the JaCoCo agent for coverage collection -->
+                    <execution>
+                        <goals>
+                            <goal>prepare-agent</goal>
+                        </goals>
+                    </execution>
+                    <!-- Generate the report after tests are executed -->
+                    <execution>
+                        <id>report</id>
+                        <phase>test</phase>
+                        <goals>
+                            <goal>report</goal>
+                        </goals>
+                    </execution>
+                </executions>
             </plugin>
 
         </plugins>
     </build>
+
 </project>

@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>ApplicationLogAggregator.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">log-parser</a> &gt; <a href="index.source.html" class="el_package">com.logparser.aggregators</a> &gt; <span class="el_source">ApplicationLogAggregator.java</span></div><h1>ApplicationLogAggregator.java</h1><pre class="source lang-java linenums">package com.logparser.aggregators;
+
+import com.logparser.logs.ApplicationLogEntry;
+import com.logparser.logs.LogEntry;
+
+import java.util.HashMap;
+import java.util.Map;
+
+/**
+ * Aggregator for Application logs.
+ * Implements the LogAggregator strategy for counting logs by severity level.
+ */
+<span class="fc" id="L13">public class ApplicationLogAggregator implements LogAggregator {</span>
+
+<span class="fc" id="L15">    private final Map&lt;String, Integer&gt; severityCounts = new HashMap&lt;&gt;();</span>
+
+    /**
+     * Adds a log entry for aggregation.
+     * Only processes ApplicationLogEntry instances.
+     *
+     * @param entry The LogEntry to aggregate.
+     */
+    @Override
+    public void addLog(LogEntry entry) {
+<span class="fc bfc" id="L25" title="All 2 branches covered.">        if (entry instanceof ApplicationLogEntry) {</span>
+<span class="fc" id="L26">            ApplicationLogEntry appLog = (ApplicationLogEntry) entry;</span>
+<span class="fc" id="L27">            String level = appLog.getLevel();</span>
+<span class="fc" id="L28">            severityCounts.put(level, severityCounts.getOrDefault(level, 0) + 1);</span>
+        }
+<span class="fc" id="L30">    }</span>
+
+    /**
+     * Aggregates the logs and returns the results as a Map.
+     *
+     * @return A Map containing severity levels as keys and their counts as values.
+     */
+    @Override
+    public Map&lt;String, Integer&gt; aggregate() {
+<span class="fc" id="L39">        return severityCounts;</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.8.202204050719</span></div></body></html>

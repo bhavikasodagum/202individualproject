@@ -12,13 +12,20 @@ public class RequestLogParser implements LogParser {
 
     @Override
     public LogEntry parse(String logLine) {
+        // Handle null or empty logs early
+        if (logLine == null || logLine.isEmpty()) {
+            return null;
+        }
         // Check if the log line contains 'request_method=' to identify Request logs
         if (logLine.contains("request_method=")) {
             try {
                 // Example: timestamp=2024-02-24T16:22:25Z request_method=POST request_url="/api/update" response_status=202 response_time_ms=200 host=webserver1
                 String[] parts = logLine.split(" ");
                 String requestMethod = parts[1].split("=")[1];  // Extract HTTP method (e.g., "POST")
-                String requestUrl = parts[2].split("=")[1];  // Extract request URL (e.g., "/api/update")
+                //String requestUrl = parts[2].split("=")[1];  // Extract request URL (e.g., "/api/update")
+                // Inside the RequestLogParser class, in the parse method:
+                String requestUrl = parts[2].split("=")[1].replaceAll("^\"|\"$", "");  // Remove surrounding quotes
+
                 String responseStatus = parts[3].split("=")[1];  // Extract HTTP status (e.g., "202")
                 double responseTimeMs = Double.parseDouble(parts[4].split("=")[1]);  // Extract response time (e.g., 200)
                 String host = parts[5].split("=")[1];  // Extract host (e.g., "webserver1")

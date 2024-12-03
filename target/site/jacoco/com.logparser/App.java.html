@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>App.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">log-parser</a> &gt; <a href="index.source.html" class="el_package">com.logparser</a> &gt; <span class="el_source">App.java</span></div><h1>App.java</h1><pre class="source lang-java linenums">package com.logparser;
+
+import com.logparser.aggregators.*;
+import com.logparser.handlers.*;
+import com.logparser.logs.*;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
+import java.io.*;
+import java.nio.file.*;
+import java.util.*;
+
+<span class="nc" id="L12">public class App {</span>
+
+    public static void main(String[] args) {
+<span class="nc bnc" id="L15" title="All 4 branches missed.">        if (args.length &lt; 2 || !args[0].equals(&quot;--file&quot;)) {</span>
+<span class="nc" id="L16">            System.err.println(&quot;Usage: java App --file &lt;input_file&gt;&quot;);</span>
+<span class="nc" id="L17">            return;</span>
+        }
+
+<span class="nc" id="L20">        String inputFilePath = args[1];</span>
+        try {
+<span class="nc" id="L22">            List&lt;String&gt; logLines = Files.readAllLines(Paths.get(inputFilePath));</span>
+
+            // Initialize log aggregators
+<span class="nc" id="L25">            LogAggregator apmAggregator = new APMLogAggregator();</span>
+<span class="nc" id="L26">            LogAggregator applicationAggregator = new ApplicationLogAggregator();</span>
+<span class="nc" id="L27">            LogAggregator requestAggregator = new RequestLogAggregator();</span>
+
+            // Set up Chain of Responsibility for parsing
+<span class="nc" id="L30">            LogHandler apmHandler = new APMLogHandler();</span>
+<span class="nc" id="L31">            LogHandler applicationHandler = new ApplicationLogHandler();</span>
+<span class="nc" id="L32">            LogHandler requestHandler = new RequestLogHandler();</span>
+<span class="nc" id="L33">            apmHandler.setNextHandler(applicationHandler);</span>
+<span class="nc" id="L34">            applicationHandler.setNextHandler(requestHandler);</span>
+
+            // Process log lines
+<span class="nc bnc" id="L37" title="All 2 branches missed.">            for (String logLine : logLines) {</span>
+<span class="nc" id="L38">                LogEntry entry = apmHandler.handle(logLine);</span>
+<span class="nc bnc" id="L39" title="All 2 branches missed.">                if (entry instanceof APMLogEntry) {</span>
+<span class="nc" id="L40">                    apmAggregator.addLog(entry);</span>
+<span class="nc bnc" id="L41" title="All 2 branches missed.">                } else if (entry instanceof ApplicationLogEntry) {</span>
+<span class="nc" id="L42">                    applicationAggregator.addLog(entry);</span>
+<span class="nc bnc" id="L43" title="All 2 branches missed.">                } else if (entry instanceof RequestLogEntry) {</span>
+<span class="nc" id="L44">                    requestAggregator.addLog(entry);</span>
+                } else {
+                    // Log line couldn't be parsed; skip
+<span class="nc" id="L47">                    System.err.println(&quot;Skipped invalid log line: &quot; + logLine);</span>
+                }
+<span class="nc" id="L49">            }</span>
+
+            // Aggregate results
+<span class="nc" id="L52">            Map&lt;String, ?&gt; apmResults = apmAggregator.aggregate();</span>
+<span class="nc" id="L53">            Map&lt;String, ?&gt; applicationResults = applicationAggregator.aggregate();</span>
+<span class="nc" id="L54">            Map&lt;String, ?&gt; requestResults = requestAggregator.aggregate();</span>
+
+            // Write results to JSON files
+<span class="nc" id="L57">            writeToJSON(&quot;apm.json&quot;, apmResults);</span>
+<span class="nc" id="L58">            writeToJSON(&quot;application.json&quot;, applicationResults);</span>
+<span class="nc" id="L59">            writeToJSON(&quot;request.json&quot;, requestResults);</span>
+
+<span class="nc" id="L61">            System.out.println(&quot;Processing completed. JSON files generated.&quot;);</span>
+
+<span class="nc" id="L63">        } catch (IOException e) {</span>
+<span class="nc" id="L64">            System.err.println(&quot;Error reading input file: &quot; + e.getMessage());</span>
+<span class="nc" id="L65">        }</span>
+<span class="nc" id="L66">    }</span>
+
+    /**
+     * Writes a Map to a JSON file using Jackson.
+     *
+     * @param fileName The output file name.
+     * @param data     The data to write.
+     */
+    private static void writeToJSON(String fileName, Map&lt;String, ?&gt; data) {
+<span class="nc" id="L75">        ObjectMapper mapper = new ObjectMapper();</span>
+<span class="nc" id="L76">        try (FileWriter writer = new FileWriter(fileName)) {</span>
+<span class="nc" id="L77">            mapper.writerWithDefaultPrettyPrinter().writeValue(writer, data);</span>
+<span class="nc" id="L78">        } catch (IOException e) {</span>
+<span class="nc" id="L79">            System.err.println(&quot;Error writing to &quot; + fileName + &quot;: &quot; + e.getMessage());</span>
+<span class="nc" id="L80">        }</span>
+<span class="nc" id="L81">    }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.8.202204050719</span></div></body></html>

@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>ApplicationLogParser.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">log-parser</a> &gt; <a href="index.source.html" class="el_package">com.logparser.parsers</a> &gt; <span class="el_source">ApplicationLogParser.java</span></div><h1>ApplicationLogParser.java</h1><pre class="source lang-java linenums">package com.logparser.parsers;
+
+import com.logparser.logs.ApplicationLogEntry;
+import com.logparser.logs.LogEntry;
+
+/**
+ * Parser for Application logs (e.g., ERROR, INFO, DEBUG).
+ */
+<span class="fc" id="L9">public class ApplicationLogParser implements LogParser {</span>
+
+    private LogParser nextParser;  // The next parser in the chain
+
+    @Override
+    public LogEntry parse(String logLine) {
+        // Trim spaces and check if the log line contains 'level=' to identify Application logs
+<span class="fc" id="L16">        logLine = logLine.trim();  // Ensure no leading/trailing spaces affect parsing</span>
+<span class="fc bfc" id="L17" title="All 2 branches covered.">        if (logLine.contains(&quot;level=&quot;)) {</span>
+            try {
+                // Split the log line into parts
+<span class="fc" id="L20">                String[] parts = logLine.split(&quot; &quot;);</span>
+<span class="fc bfc" id="L21" title="All 2 branches covered.">                if (parts.length &lt; 4) {</span>
+<span class="fc" id="L22">                    return null;  // Not enough parts, return null</span>
+                }
+
+                // Extract the timestamp, level, message, and host
+<span class="fc" id="L26">                String timestamp = parts[0].split(&quot;=&quot;)[1];  // Extract timestamp</span>
+<span class="fc" id="L27">                String level = parts[1].split(&quot;=&quot;)[1];      // Extract log level (e.g., &quot;INFO&quot;)</span>
+<span class="fc" id="L28">                String message = extractMessage(logLine);   // Extract message (may contain spaces)</span>
+<span class="fc" id="L29">                String host = parts[parts.length - 1].split(&quot;=&quot;)[1];  // Extract host (last field)</span>
+
+                // Return an ApplicationLogEntry object with the parsed data
+<span class="fc" id="L32">                return new ApplicationLogEntry(timestamp, level, message, host);</span>
+<span class="fc" id="L33">            } catch (Exception e) {</span>
+                // Log the error for debugging
+<span class="fc" id="L35">                System.err.println(&quot;Error parsing Application log line: &quot; + logLine + &quot; - &quot; + e.getMessage());</span>
+<span class="fc" id="L36">                return null;</span>
+            }
+        }
+
+        // If not an Application log, pass to the next parser
+<span class="fc bfc" id="L41" title="All 2 branches covered.">        return nextParser != null ? nextParser.parse(logLine) : null;</span>
+    }
+
+    /**
+     * Helper method to extract the message field from the log line.
+     *
+     * @param logLine The full log line.
+     * @return The extracted message.
+     */
+    private String extractMessage(String logLine) {
+        // Find the start and end positions of the message field
+<span class="fc" id="L52">        int messageStart = logLine.indexOf(&quot;message=&quot;) + 8; // Start after &quot;message=&quot;</span>
+<span class="fc" id="L53">        int messageEnd = logLine.lastIndexOf(&quot;host=&quot;) - 1;  // End before &quot;host=&quot;</span>
+<span class="pc bpc" id="L54" title="1 of 4 branches missed.">        if (messageStart &gt;= 0 &amp;&amp; messageEnd &gt; messageStart) {</span>
+<span class="fc" id="L55">            return logLine.substring(messageStart, messageEnd).replace(&quot;\&quot;&quot;, &quot;&quot;); // Remove quotes</span>
+        }
+<span class="fc" id="L57">        return &quot;&quot;;  // Return empty string if no message found</span>
+    }
+
+    public void setNextParser(LogParser nextParser) {
+<span class="fc" id="L61">        this.nextParser = nextParser;  // Set the next parser in the chain</span>
+<span class="fc" id="L62">    }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.8.202204050719</span></div></body></html>
