@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<testsuite xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://maven.apache.org/surefire/maven-surefire-plugin/xsd/surefire-test-report.xsd" name="com.logparser.ApplicationLogHandlerTest" time="0.003" tests="6" errors="0" skipped="0" failures="0">
+<testsuite xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://maven.apache.org/surefire/maven-surefire-plugin/xsd/surefire-test-report.xsd" name="com.logparser.LogParserIntegrationTest" time="0.021" tests="5" errors="0" skipped="0" failures="0">
   <properties>
     <property name="java.specification.version" value="22"/>
     <property name="sun.jnu.encoding" value="UTF-8"/>
@@ -57,10 +57,9 @@
     <property name="socksNonProxyHosts" value="local|*.local|169.254/16|*.169.254/16"/>
     <property name="java.class.version" value="66.0"/>
   </properties>
-  <testcase name="handle_shouldProcessApplicationLogCorrectly" classname="com.logparser.ApplicationLogHandlerTest" time="0"/>
-  <testcase name="handle_shouldPassNonApplicationLogToNextHandler" classname="com.logparser.ApplicationLogHandlerTest" time="0"/>
-  <testcase name="handle_shouldReturnNullForInvalidLog" classname="com.logparser.ApplicationLogHandlerTest" time="0.001"/>
-  <testcase name="setNextHandler_shouldSetNextHandlerCorrectly" classname="com.logparser.ApplicationLogHandlerTest" time="0"/>
-  <testcase name="handle_shouldReturnNullWhenNextHandlerIsNullAndLogIsUnhandled" classname="com.logparser.ApplicationLogHandlerTest" time="0"/>
-  <testcase name="constructor_shouldInitializeParser" classname="com.logparser.ApplicationLogHandlerTest" time="0"/>
+  <testcase name="testSingleAPMLog" classname="com.logparser.LogParserIntegrationTest" time="0.009"/>
+  <testcase name="testNormalFlow" classname="com.logparser.LogParserIntegrationTest" time="0.006"/>
+  <testcase name="testEmptyApplicationLog" classname="com.logparser.LogParserIntegrationTest" time="0.002"/>
+  <testcase name="testEmptyAPMLog" classname="com.logparser.LogParserIntegrationTest" time="0.002"/>
+  <testcase name="testEmptyRequestLog" classname="com.logparser.LogParserIntegrationTest" time="0.001"/>
 </testsuite>

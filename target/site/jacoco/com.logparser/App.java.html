@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>App.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">log-parser</a> &gt; <a href="index.source.html" class="el_package">com.logparser</a> &gt; <span class="el_source">App.java</span></div><h1>App.java</h1><pre class="source lang-java linenums">package com.logparser;
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>App.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">log-parser</a> &gt; <a href="index.source.html" class="el_package">com.logparser</a> &gt; <span class="el_source">App.java</span></div><h1>App.java</h1><pre class="source lang-java linenums">/*package com.logparser;
 
 import com.logparser.aggregators.*;
 import com.logparser.handlers.*;
@@ -9,61 +9,61 @@ import java.io.*;
 import java.nio.file.*;
 import java.util.*;
 
-<span class="nc" id="L12">public class App {</span>
+public class App {
 
     public static void main(String[] args) {
-<span class="nc bnc" id="L15" title="All 4 branches missed.">        if (args.length &lt; 2 || !args[0].equals(&quot;--file&quot;)) {</span>
-<span class="nc" id="L16">            System.err.println(&quot;Usage: java App --file &lt;input_file&gt;&quot;);</span>
-<span class="nc" id="L17">            return;</span>
+        if (args.length &lt; 2 || !args[0].equals(&quot;--file&quot;)) {
+            System.err.println(&quot;Usage: java App --file &lt;input_file&gt;&quot;);
+            return;
         }
 
-<span class="nc" id="L20">        String inputFilePath = args[1];</span>
+        String inputFilePath = args[1];
         try {
-<span class="nc" id="L22">            List&lt;String&gt; logLines = Files.readAllLines(Paths.get(inputFilePath));</span>
+            List&lt;String&gt; logLines = Files.readAllLines(Paths.get(inputFilePath));
 
             // Initialize log aggregators
-<span class="nc" id="L25">            LogAggregator apmAggregator = new APMLogAggregator();</span>
-<span class="nc" id="L26">            LogAggregator applicationAggregator = new ApplicationLogAggregator();</span>
-<span class="nc" id="L27">            LogAggregator requestAggregator = new RequestLogAggregator();</span>
+            LogAggregator apmAggregator = new APMLogAggregator();
+            LogAggregator applicationAggregator = new ApplicationLogAggregator();
+            LogAggregator requestAggregator = new RequestLogAggregator();
 
             // Set up Chain of Responsibility for parsing
-<span class="nc" id="L30">            LogHandler apmHandler = new APMLogHandler();</span>
-<span class="nc" id="L31">            LogHandler applicationHandler = new ApplicationLogHandler();</span>
-<span class="nc" id="L32">            LogHandler requestHandler = new RequestLogHandler();</span>
-<span class="nc" id="L33">            apmHandler.setNextHandler(applicationHandler);</span>
-<span class="nc" id="L34">            applicationHandler.setNextHandler(requestHandler);</span>
+            LogHandler apmHandler = new APMLogHandler();
+            LogHandler applicationHandler = new ApplicationLogHandler();
+            LogHandler requestHandler = new RequestLogHandler();
+            apmHandler.setNextHandler(applicationHandler);
+            applicationHandler.setNextHandler(requestHandler);
 
             // Process log lines
-<span class="nc bnc" id="L37" title="All 2 branches missed.">            for (String logLine : logLines) {</span>
-<span class="nc" id="L38">                LogEntry entry = apmHandler.handle(logLine);</span>
-<span class="nc bnc" id="L39" title="All 2 branches missed.">                if (entry instanceof APMLogEntry) {</span>
-<span class="nc" id="L40">                    apmAggregator.addLog(entry);</span>
-<span class="nc bnc" id="L41" title="All 2 branches missed.">                } else if (entry instanceof ApplicationLogEntry) {</span>
-<span class="nc" id="L42">                    applicationAggregator.addLog(entry);</span>
-<span class="nc bnc" id="L43" title="All 2 branches missed.">                } else if (entry instanceof RequestLogEntry) {</span>
-<span class="nc" id="L44">                    requestAggregator.addLog(entry);</span>
+            for (String logLine : logLines) {
+                LogEntry entry = apmHandler.handle(logLine);
+                if (entry instanceof APMLogEntry) {
+                    apmAggregator.addLog(entry);
+                } else if (entry instanceof ApplicationLogEntry) {
+                    applicationAggregator.addLog(entry);
+                } else if (entry instanceof RequestLogEntry) {
+                    requestAggregator.addLog(entry);
                 } else {
                     // Log line couldn't be parsed; skip
-<span class="nc" id="L47">                    System.err.println(&quot;Skipped invalid log line: &quot; + logLine);</span>
+                    System.err.println(&quot;Skipped invalid log line: &quot; + logLine);
                 }
-<span class="nc" id="L49">            }</span>
+            }
 
             // Aggregate results
-<span class="nc" id="L52">            Map&lt;String, ?&gt; apmResults = apmAggregator.aggregate();</span>
-<span class="nc" id="L53">            Map&lt;String, ?&gt; applicationResults = applicationAggregator.aggregate();</span>
-<span class="nc" id="L54">            Map&lt;String, ?&gt; requestResults = requestAggregator.aggregate();</span>
+            Map&lt;String, ?&gt; apmResults = apmAggregator.aggregate();
+            Map&lt;String, ?&gt; applicationResults = applicationAggregator.aggregate();
+            Map&lt;String, ?&gt; requestResults = requestAggregator.aggregate();
 
             // Write results to JSON files
-<span class="nc" id="L57">            writeToJSON(&quot;apm.json&quot;, apmResults);</span>
-<span class="nc" id="L58">            writeToJSON(&quot;application.json&quot;, applicationResults);</span>
-<span class="nc" id="L59">            writeToJSON(&quot;request.json&quot;, requestResults);</span>
+            writeToJSON(&quot;apm.json&quot;, apmResults);
+            writeToJSON(&quot;application.json&quot;, applicationResults);
+            writeToJSON(&quot;request.json&quot;, requestResults);
 
-<span class="nc" id="L61">            System.out.println(&quot;Processing completed. JSON files generated.&quot;);</span>
+            System.out.println(&quot;Processing completed. JSON files generated.&quot;);
 
-<span class="nc" id="L63">        } catch (IOException e) {</span>
-<span class="nc" id="L64">            System.err.println(&quot;Error reading input file: &quot; + e.getMessage());</span>
-<span class="nc" id="L65">        }</span>
-<span class="nc" id="L66">    }</span>
+        } catch (IOException e) {
+            System.err.println(&quot;Error reading input file: &quot; + e.getMessage());
+        }
+    }
 
     /**
      * Writes a Map to a JSON file using Jackson.
@@ -71,13 +71,120 @@ import java.util.*;
      * @param fileName The output file name.
      * @param data     The data to write.
      */
-    private static void writeToJSON(String fileName, Map&lt;String, ?&gt; data) {
-<span class="nc" id="L75">        ObjectMapper mapper = new ObjectMapper();</span>
-<span class="nc" id="L76">        try (FileWriter writer = new FileWriter(fileName)) {</span>
-<span class="nc" id="L77">            mapper.writerWithDefaultPrettyPrinter().writeValue(writer, data);</span>
-<span class="nc" id="L78">        } catch (IOException e) {</span>
-<span class="nc" id="L79">            System.err.println(&quot;Error writing to &quot; + fileName + &quot;: &quot; + e.getMessage());</span>
-<span class="nc" id="L80">        }</span>
-<span class="nc" id="L81">    }</span>
+/* -rem thiswhen rem hash    public static void writeToJSON(String fileName, Map&lt;String, ?&gt; data) {
+        ObjectMapper mapper = new ObjectMapper();
+        try (FileWriter writer = new FileWriter(fileName)) {
+            mapper.writerWithDefaultPrettyPrinter().writeValue(writer, data);
+        } catch (IOException e) {
+            System.err.println(&quot;Error writing to &quot; + fileName + &quot;: &quot; + e.getMessage());
+        }
+    }
+}
+*/ // 1
+package com.logparser;
+
+import com.logparser.aggregators.*;
+import com.logparser.handlers.*;
+import com.logparser.logs.*;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
+import java.io.*;
+import java.nio.file.*;
+import java.util.*;
+
+<span class="nc" id="L95">public class App {</span>
+
+    public static void main(String[] args) {
+<span class="pc bpc" id="L98" title="1 of 4 branches missed.">        if (args.length &lt; 2 || !args[0].equals(&quot;--file&quot;)) {</span>
+<span class="fc" id="L99">            System.err.println(&quot;Usage: java App --file &lt;input_file&gt; [--apm &lt;apm_output&gt;] [--application &lt;application_output&gt;] [--request &lt;request_output&gt;]&quot;);</span>
+<span class="fc" id="L100">            return;</span>
+        }
+
+<span class="fc" id="L103">        String inputFilePath = args[1];</span>
+
+        // Default output file names
+<span class="fc" id="L106">        String apmOutputFile = &quot;apm.json&quot;;</span>
+<span class="fc" id="L107">        String applicationOutputFile = &quot;application.json&quot;;</span>
+<span class="fc" id="L108">        String requestOutputFile = &quot;request.json&quot;;</span>
+
+        // Parse optional output file arguments
+<span class="fc bfc" id="L111" title="All 2 branches covered.">        for (int i = 2; i &lt; args.length; i++) {</span>
+<span class="pc bpc" id="L112" title="1 of 4 branches missed.">            switch (args[i]) {</span>
+                case &quot;--apm&quot;:
+<span class="fc" id="L114">                    apmOutputFile = args[++i];</span>
+<span class="fc" id="L115">                    break;</span>
+                case &quot;--application&quot;:
+<span class="fc" id="L117">                    applicationOutputFile = args[++i];</span>
+<span class="fc" id="L118">                    break;</span>
+                case &quot;--request&quot;:
+<span class="fc" id="L120">                    requestOutputFile = args[++i];</span>
+<span class="fc" id="L121">                    break;</span>
+                default:
+<span class="nc" id="L123">                    System.err.println(&quot;Unknown argument: &quot; + args[i]);</span>
+<span class="nc" id="L124">                    return;</span>
+            }
+        }
+
+        try {
+<span class="fc" id="L129">            List&lt;String&gt; logLines = Files.readAllLines(Paths.get(inputFilePath));</span>
+
+            // Initialize log aggregators
+<span class="fc" id="L132">            LogAggregator apmAggregator = new APMLogAggregator();</span>
+<span class="fc" id="L133">            LogAggregator applicationAggregator = new ApplicationLogAggregator();</span>
+<span class="fc" id="L134">            LogAggregator requestAggregator = new RequestLogAggregator();</span>
+
+            // Set up Chain of Responsibility for parsing
+<span class="fc" id="L137">            LogHandler apmHandler = new APMLogHandler();</span>
+<span class="fc" id="L138">            LogHandler applicationHandler = new ApplicationLogHandler();</span>
+<span class="fc" id="L139">            LogHandler requestHandler = new RequestLogHandler();</span>
+<span class="fc" id="L140">            apmHandler.setNextHandler(applicationHandler);</span>
+<span class="fc" id="L141">            applicationHandler.setNextHandler(requestHandler);</span>
+
+            // Process log lines
+<span class="fc bfc" id="L144" title="All 2 branches covered.">            for (String logLine : logLines) {</span>
+<span class="fc" id="L145">                LogEntry entry = apmHandler.handle(logLine);</span>
+<span class="fc bfc" id="L146" title="All 2 branches covered.">                if (entry instanceof APMLogEntry) {</span>
+<span class="fc" id="L147">                    apmAggregator.addLog(entry);</span>
+<span class="fc bfc" id="L148" title="All 2 branches covered.">                } else if (entry instanceof ApplicationLogEntry) {</span>
+<span class="fc" id="L149">                    applicationAggregator.addLog(entry);</span>
+<span class="fc bfc" id="L150" title="All 2 branches covered.">                } else if (entry instanceof RequestLogEntry) {</span>
+<span class="fc" id="L151">                    requestAggregator.addLog(entry);</span>
+                } else {
+                    // Log line couldn't be parsed; skip
+<span class="fc" id="L154">                    System.err.println(&quot;Skipped invalid log line: &quot; + logLine);</span>
+                }
+<span class="fc" id="L156">            }</span>
+
+            // Aggregate results
+<span class="fc" id="L159">            Map&lt;String, ?&gt; apmResults = apmAggregator.aggregate();</span>
+<span class="fc" id="L160">            Map&lt;String, ?&gt; applicationResults = applicationAggregator.aggregate();</span>
+<span class="fc" id="L161">            Map&lt;String, ?&gt; requestResults = requestAggregator.aggregate();</span>
+
+            // Write results to JSON files
+<span class="fc" id="L164">            writeToJSON(apmOutputFile, apmResults);</span>
+<span class="fc" id="L165">            writeToJSON(applicationOutputFile, applicationResults);</span>
+<span class="fc" id="L166">            writeToJSON(requestOutputFile, requestResults);</span>
+
+<span class="fc" id="L168">            System.out.println(&quot;Processing completed. JSON files generated.&quot;);</span>
+
+<span class="fc" id="L170">        } catch (IOException e) {</span>
+<span class="fc" id="L171">            System.err.println(&quot;Error reading input file: &quot; + e.getMessage());</span>
+<span class="fc" id="L172">        }</span>
+<span class="fc" id="L173">    }</span>
+
+    /**
+     * Writes a Map to a JSON file using Jackson.
+     *
+     * @param fileName The output file name.
+     * @param data     The data to write.
+     */
+    public static void writeToJSON(String fileName, Map&lt;String, ?&gt; data) {
+<span class="fc" id="L182">        ObjectMapper mapper = new ObjectMapper();</span>
+<span class="fc" id="L183">        try (FileWriter writer = new FileWriter(fileName)) {</span>
+<span class="fc" id="L184">            mapper.writerWithDefaultPrettyPrinter().writeValue(writer, data);</span>
+<span class="nc" id="L185">        } catch (IOException e) {</span>
+<span class="nc" id="L186">            System.err.println(&quot;Error writing to &quot; + fileName + &quot;: &quot; + e.getMessage());</span>
+<span class="fc" id="L187">        }</span>
+<span class="fc" id="L188">    }</span>
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.8.202204050719</span></div></body></html>
