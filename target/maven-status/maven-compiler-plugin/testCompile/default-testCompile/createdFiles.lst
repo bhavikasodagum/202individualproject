@@ -1,7 +1,6 @@
 com/logparser/APMLogHandlerTest$TestLogHandler.class
 com/logparser/RequestLogHandlerTest$TestLogHandler.class
 com/logparser/APMLogHandlerTest.class
-com/logparser/AppTest.class
 com/logparser/ApplicationLogParserTest.class
 com/logparser/RequestLogHandlerTest$1.class
 com/logparser/ApplicationLogHandlerTest$TestLogHandler.class
@@ -16,4 +15,5 @@ com/logparser/RequestLogHandlerTest.class
 com/logparser/ApplicationLogHandlerTest$1.class
 com/logparser/APMLogEntryTest.class
 com/logparser/ApplicationLogAggregatorTest.class
+com/logparser/RequestLogAggregatorTest.class
 com/logparser/APMLogAggregatorTest.class

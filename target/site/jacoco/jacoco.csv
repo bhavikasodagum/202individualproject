@@ -11,5 +11,5 @@ log-parser,com.logparser.handlers,RequestLogHandler,0,8,0,0,0,3,0,1,0,1
 log-parser,com.logparser.handlers,ApplicationLogHandler,0,8,0,0,0,3,0,1,0,1
 log-parser,com.logparser.handlers,APMLogHandler,0,8,0,0,0,3,0,1,0,1
 log-parser,com.logparser.aggregators,APMLogAggregator,0,173,0,6,0,32,0,8,0,5
-log-parser,com.logparser.aggregators,RequestLogAggregator,338,0,16,0,58,0,20,0,12,0
+log-parser,com.logparser.aggregators,RequestLogAggregator,2,343,1,19,1,59,1,21,0,12
 log-parser,com.logparser.aggregators,ApplicationLogAggregator,0,37,0,2,0,8,0,4,0,3

@@ -124,6 +124,10 @@ public class RequestLogAggregator implements LogAggregator {
      * @return The status code category (e.g., "2XX").
      */
     private String getStatusCategory(String statusCode) {
+        // Added Handling for null and Empty Strings 
+        if (statusCode == null || statusCode.isEmpty()) {
+            return "Other";
+        }
         if (statusCode.startsWith("2")) {
             return "2XX";
         } else if (statusCode.startsWith("4")) {
@@ -133,6 +137,8 @@ public class RequestLogAggregator implements LogAggregator {
         }
         return "Other";
     }
+    
+    
 
     /**
      * Initializes status code counts with zero values for "2XX", "4XX", and "5XX".

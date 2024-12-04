@@ -9,15 +9,15 @@ import java.util.*;
  * Aggregator for Request logs.
  * Implements the LogAggregator strategy for request log entries.
  */
-<span class="nc" id="L12">public class RequestLogAggregator implements LogAggregator {</span>
+<span class="fc" id="L12">public class RequestLogAggregator implements LogAggregator {</span>
 
-<span class="nc" id="L14">    private static final List&lt;Integer&gt; PERCENTILES = Arrays.asList(50, 90, 95, 99);</span>
+<span class="fc" id="L14">    private static final List&lt;Integer&gt; PERCENTILES = Arrays.asList(50, 90, 95, 99);</span>
 
     // Map to store response times grouped by API route
-<span class="nc" id="L17">    private final Map&lt;String, List&lt;Double&gt;&gt; responseTimesMap = new HashMap&lt;&gt;();</span>
+<span class="fc" id="L17">    private final Map&lt;String, List&lt;Double&gt;&gt; responseTimesMap = new HashMap&lt;&gt;();</span>
 
     // Map to store status code counts grouped by API route
-<span class="nc" id="L20">    private final Map&lt;String, Map&lt;String, Integer&gt;&gt; statusCodesMap = new HashMap&lt;&gt;();</span>
+<span class="fc" id="L20">    private final Map&lt;String, Map&lt;String, Integer&gt;&gt; statusCodesMap = new HashMap&lt;&gt;();</span>
 
     /**
      * Adds a log entry for aggregation.
@@ -27,20 +27,20 @@ import java.util.*;
      */
     @Override
     public void addLog(LogEntry entry) {
-<span class="nc bnc" id="L30" title="All 2 branches missed.">        if (entry instanceof RequestLogEntry) {</span>
-<span class="nc" id="L31">            RequestLogEntry requestLog = (RequestLogEntry) entry;</span>
-<span class="nc" id="L32">            String url = requestLog.getRequestUrl();</span>
-<span class="nc" id="L33">            double responseTime = requestLog.getResponseTimeMs();</span>
-<span class="nc" id="L34">            String statusCodeCategory = getStatusCategory(requestLog.getResponseStatus());</span>
+<span class="fc bfc" id="L30" title="All 2 branches covered.">        if (entry instanceof RequestLogEntry) {</span>
+<span class="fc" id="L31">            RequestLogEntry requestLog = (RequestLogEntry) entry;</span>
+<span class="fc" id="L32">            String url = requestLog.getRequestUrl();</span>
+<span class="fc" id="L33">            double responseTime = requestLog.getResponseTimeMs();</span>
+<span class="fc" id="L34">            String statusCodeCategory = getStatusCategory(requestLog.getResponseStatus());</span>
 
             // Add response time to the map
-<span class="nc" id="L37">            responseTimesMap.computeIfAbsent(url, k -&gt; new ArrayList&lt;&gt;()).add(responseTime);</span>
+<span class="fc" id="L37">            responseTimesMap.computeIfAbsent(url, k -&gt; new ArrayList&lt;&gt;()).add(responseTime);</span>
 
             // Update status code counts
-<span class="nc" id="L40">            statusCodesMap.computeIfAbsent(url, k -&gt; initializeStatusCounts())</span>
-<span class="nc" id="L41">                    .merge(statusCodeCategory, 1, Integer::sum);</span>
+<span class="fc" id="L40">            statusCodesMap.computeIfAbsent(url, k -&gt; initializeStatusCounts())</span>
+<span class="fc" id="L41">                    .merge(statusCodeCategory, 1, Integer::sum);</span>
         }
-<span class="nc" id="L43">    }</span>
+<span class="fc" id="L43">    }</span>
 
     /**
      * Aggregates the logs and returns the results as a Map.
@@ -49,24 +49,24 @@ import java.util.*;
      */
     @Override
     public Map&lt;String, Map&lt;String, Object&gt;&gt; aggregate() {
-<span class="nc" id="L52">        Map&lt;String, Map&lt;String, Object&gt;&gt; result = new HashMap&lt;&gt;();</span>
+<span class="fc" id="L52">        Map&lt;String, Map&lt;String, Object&gt;&gt; result = new HashMap&lt;&gt;();</span>
 
-<span class="nc bnc" id="L54" title="All 2 branches missed.">        for (String url : responseTimesMap.keySet()) {</span>
-<span class="nc" id="L55">            List&lt;Double&gt; responseTimes = responseTimesMap.get(url);</span>
-<span class="nc" id="L56">            Collections.sort(responseTimes);  // Sort response times for percentile calculations</span>
+<span class="fc bfc" id="L54" title="All 2 branches covered.">        for (String url : responseTimesMap.keySet()) {</span>
+<span class="fc" id="L55">            List&lt;Double&gt; responseTimes = responseTimesMap.get(url);</span>
+<span class="fc" id="L56">            Collections.sort(responseTimes);  // Sort response times for percentile calculations</span>
 
             // Calculate statistics
-<span class="nc" id="L59">            int min = (int) responseTimes.get(0).doubleValue();</span>
-<span class="nc" id="L60">            int max = (int) responseTimes.get(responseTimes.size() - 1).doubleValue();</span>
+<span class="fc" id="L59">            int min = (int) responseTimes.get(0).doubleValue();</span>
+<span class="fc" id="L60">            int max = (int) responseTimes.get(responseTimes.size() - 1).doubleValue();</span>
 
-<span class="nc" id="L62">            Map&lt;String, Object&gt; routeStats = new LinkedHashMap&lt;&gt;();</span>
-<span class="nc" id="L63">            routeStats.put(&quot;response_times&quot;, calculateResponseTimeStats(responseTimes, min, max));</span>
-<span class="nc" id="L64">            routeStats.put(&quot;status_codes&quot;, statusCodesMap.get(url));</span>
+<span class="fc" id="L62">            Map&lt;String, Object&gt; routeStats = new LinkedHashMap&lt;&gt;();</span>
+<span class="fc" id="L63">            routeStats.put(&quot;response_times&quot;, calculateResponseTimeStats(responseTimes, min, max));</span>
+<span class="fc" id="L64">            routeStats.put(&quot;status_codes&quot;, statusCodesMap.get(url));</span>
 
-<span class="nc" id="L66">            result.put(url, routeStats);</span>
-<span class="nc" id="L67">        }</span>
+<span class="fc" id="L66">            result.put(url, routeStats);</span>
+<span class="fc" id="L67">        }</span>
 
-<span class="nc" id="L69">        return result;</span>
+<span class="fc" id="L69">        return result;</span>
     }
 
     /**
@@ -78,20 +78,20 @@ import java.util.*;
      * @return A map of response time statistics.
      */
     private Map&lt;String, Object&gt; calculateResponseTimeStats(List&lt;Double&gt; values, int min, int max) {
-<span class="nc" id="L81">        Map&lt;String, Object&gt; stats = new LinkedHashMap&lt;&gt;();</span>
-<span class="nc" id="L82">        stats.put(&quot;min&quot;, min);</span>
+<span class="fc" id="L81">        Map&lt;String, Object&gt; stats = new LinkedHashMap&lt;&gt;();</span>
+<span class="fc" id="L82">        stats.put(&quot;min&quot;, min);</span>
 
-<span class="nc bnc" id="L84" title="All 2 branches missed.">        for (int percentile : PERCENTILES) {</span>
-<span class="nc" id="L85">            double percentileValue = calculatePercentile(values, percentile);</span>
-<span class="nc bnc" id="L86" title="All 2 branches missed.">            if (percentile == 99) {</span>
-<span class="nc" id="L87">                stats.put(percentile + &quot;_percentile&quot;, roundToTwoDecimalPlaces(percentileValue));</span>
+<span class="fc bfc" id="L84" title="All 2 branches covered.">        for (int percentile : PERCENTILES) {</span>
+<span class="fc" id="L85">            double percentileValue = calculatePercentile(values, percentile);</span>
+<span class="fc bfc" id="L86" title="All 2 branches covered.">            if (percentile == 99) {</span>
+<span class="fc" id="L87">                stats.put(percentile + &quot;_percentile&quot;, roundToTwoDecimalPlaces(percentileValue));</span>
             } else {
-<span class="nc" id="L89">                stats.put(percentile + &quot;_percentile&quot;, roundToOneDecimalPlace(percentileValue));</span>
+<span class="fc" id="L89">                stats.put(percentile + &quot;_percentile&quot;, roundToOneDecimalPlace(percentileValue));</span>
             }
-<span class="nc" id="L91">        }</span>
+<span class="fc" id="L91">        }</span>
 
-<span class="nc" id="L93">        stats.put(&quot;max&quot;, max);</span>
-<span class="nc" id="L94">        return stats;</span>
+<span class="fc" id="L93">        stats.put(&quot;max&quot;, max);</span>
+<span class="fc" id="L94">        return stats;</span>
     }
 
     /**
@@ -102,18 +102,18 @@ import java.util.*;
      * @return The percentile value.
      */
     private double calculatePercentile(List&lt;Double&gt; values, int percentile) {
-<span class="nc" id="L105">        int n = values.size();</span>
-<span class="nc" id="L106">        double rank = (percentile / 100.0) * (n - 1); // Rank index</span>
-<span class="nc" id="L107">        int lowerIndex = (int) Math.floor(rank);</span>
-<span class="nc" id="L108">        int upperIndex = (int) Math.ceil(rank);</span>
+<span class="fc" id="L105">        int n = values.size();</span>
+<span class="fc" id="L106">        double rank = (percentile / 100.0) * (n - 1); // Rank index</span>
+<span class="fc" id="L107">        int lowerIndex = (int) Math.floor(rank);</span>
+<span class="fc" id="L108">        int upperIndex = (int) Math.ceil(rank);</span>
 
-<span class="nc bnc" id="L110" title="All 2 branches missed.">        if (lowerIndex == upperIndex) {</span>
-<span class="nc" id="L111">            return values.get(lowerIndex);</span>
+<span class="fc bfc" id="L110" title="All 2 branches covered.">        if (lowerIndex == upperIndex) {</span>
+<span class="fc" id="L111">            return values.get(lowerIndex);</span>
         } else {
             // Linear interpolation
-<span class="nc" id="L114">            double lowerValue = values.get(lowerIndex);</span>
-<span class="nc" id="L115">            double upperValue = values.get(upperIndex);</span>
-<span class="nc" id="L116">            return lowerValue + (rank - lowerIndex) * (upperValue - lowerValue);</span>
+<span class="fc" id="L114">            double lowerValue = values.get(lowerIndex);</span>
+<span class="fc" id="L115">            double upperValue = values.get(upperIndex);</span>
+<span class="fc" id="L116">            return lowerValue + (rank - lowerIndex) * (upperValue - lowerValue);</span>
         }
     }
 
@@ -124,15 +124,21 @@ import java.util.*;
      * @return The status code category (e.g., &quot;2XX&quot;).
      */
     private String getStatusCategory(String statusCode) {
-<span class="nc bnc" id="L127" title="All 2 branches missed.">        if (statusCode.startsWith(&quot;2&quot;)) {</span>
-<span class="nc" id="L128">            return &quot;2XX&quot;;</span>
-<span class="nc bnc" id="L129" title="All 2 branches missed.">        } else if (statusCode.startsWith(&quot;4&quot;)) {</span>
-<span class="nc" id="L130">            return &quot;4XX&quot;;</span>
-<span class="nc bnc" id="L131" title="All 2 branches missed.">        } else if (statusCode.startsWith(&quot;5&quot;)) {</span>
-<span class="nc" id="L132">            return &quot;5XX&quot;;</span>
+        // Added Handling for null and Empty Strings 
+<span class="fc bfc" id="L128" title="All 4 branches covered.">        if (statusCode == null || statusCode.isEmpty()) {</span>
+<span class="fc" id="L129">            return &quot;Other&quot;;</span>
         }
-<span class="nc" id="L134">        return &quot;Other&quot;;</span>
+<span class="fc bfc" id="L131" title="All 2 branches covered.">        if (statusCode.startsWith(&quot;2&quot;)) {</span>
+<span class="fc" id="L132">            return &quot;2XX&quot;;</span>
+<span class="fc bfc" id="L133" title="All 2 branches covered.">        } else if (statusCode.startsWith(&quot;4&quot;)) {</span>
+<span class="fc" id="L134">            return &quot;4XX&quot;;</span>
+<span class="pc bpc" id="L135" title="1 of 2 branches missed.">        } else if (statusCode.startsWith(&quot;5&quot;)) {</span>
+<span class="nc" id="L136">            return &quot;5XX&quot;;</span>
+        }
+<span class="fc" id="L138">        return &quot;Other&quot;;</span>
     }
+    
+    
 
     /**
      * Initializes status code counts with zero values for &quot;2XX&quot;, &quot;4XX&quot;, and &quot;5XX&quot;.
@@ -140,11 +146,11 @@ import java.util.*;
      * @return A map with initialized status code categories.
      */
     private Map&lt;String, Integer&gt; initializeStatusCounts() {
-<span class="nc" id="L143">        Map&lt;String, Integer&gt; counts = new HashMap&lt;&gt;();</span>
-<span class="nc" id="L144">        counts.put(&quot;2XX&quot;, 0);</span>
-<span class="nc" id="L145">        counts.put(&quot;4XX&quot;, 0);</span>
-<span class="nc" id="L146">        counts.put(&quot;5XX&quot;, 0);</span>
-<span class="nc" id="L147">        return counts;</span>
+<span class="fc" id="L149">        Map&lt;String, Integer&gt; counts = new HashMap&lt;&gt;();</span>
+<span class="fc" id="L150">        counts.put(&quot;2XX&quot;, 0);</span>
+<span class="fc" id="L151">        counts.put(&quot;4XX&quot;, 0);</span>
+<span class="fc" id="L152">        counts.put(&quot;5XX&quot;, 0);</span>
+<span class="fc" id="L153">        return counts;</span>
     }
 
     /**
@@ -154,7 +160,7 @@ import java.util.*;
      * @return The rounded value.
      */
     private double roundToOneDecimalPlace(double value) {
-<span class="nc" id="L157">        return Math.round(value * 10.0) / 10.0;</span>
+<span class="fc" id="L163">        return Math.round(value * 10.0) / 10.0;</span>
     }
 
     /**
@@ -164,7 +170,7 @@ import java.util.*;
      * @return The rounded value.
      */
     private double roundToTwoDecimalPlaces(double value) {
-<span class="nc" id="L167">        return Math.round(value * 100.0) / 100.0;</span>
+<span class="fc" id="L173">        return Math.round(value * 100.0) / 100.0;</span>
     }
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.8.202204050719</span></div></body></html>
